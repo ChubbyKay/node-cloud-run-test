@@ -1,0 +1,23 @@
+steps:
+  # 1. 打包 Docker Image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'asia-east1-docker.pkg.dev/$PROJECT_ID/my-repo/node-test-image:$COMMIT_SHA', '.']
+
+  # 2. 推送到 Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'asia-east1-docker.pkg.dev/$PROJECT_ID/my-repo/node-test-image:$COMMIT_SHA']
+
+  # 3. 部署到 Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'node-test-service'
+      - '--image'
+      - 'asia-east1-docker.pkg.dev/$PROJECT_ID/my-repo/node-test-image:$COMMIT_SHA'
+      - '--region'
+      - 'asia-east1'
+      - '--tag'
+      - 'v-${SHORT_SHA}' # 這會讓你在 Cloud Run 看到一個簡短的標記，方便辨識
+      - '--allow-unauthenticated' # 允許公開存取測試，若要私人用則移除
