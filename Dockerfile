@@ -11,7 +11,7 @@ RUN npm install --only=production
 COPY . .
 
 # Cloud Run 預設會給 $PORT 環境變數，你的程式必須監聽它
-EXPOSE 8080
+EXPOSE 8090
 
 # 啟動指令
 CMD [ "node", "index.js" ]
